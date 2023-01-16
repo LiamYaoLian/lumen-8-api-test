@@ -31,8 +31,7 @@ $ php artisan jwt:secret
 $ php artisan migrate
 ```
 
-To test application follow the tutorial bellow.
-Click on the image bellow to see YouTube video.
+To test application follow the video bellow:
 
 TODO
 
