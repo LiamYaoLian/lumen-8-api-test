@@ -17,8 +17,9 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index()->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('content');
-            $table->dateTime('completion_time');
+            $table->string('note_content');
+            $table->dateTime('completion_time')->nullable();
+            $table->timestamps();
         });
     }
 

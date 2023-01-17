@@ -3,24 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\TodoNote;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\JWTAuth;
 
-class PostController extends Controller
+class TodoNoteController extends Controller
 {
-    public function index()
+    public function listForLoggedInUser()
     {
-        return Post::all();
+        // TODO
+        return TodoNote::all();
+    }
+
+    public function listForUser($userId)
+    {
     }
 
     public function store(Request $request)
     {
         try {
-            $post = new Post();
-            $post->title = $request->title;
-            $post->body = $request->body;
+            $todoNote = new TodoNote();
 
-            if ($post->save()) {
+            // TODO style
+            $todoNote->user_id = auth()->user()->id;
+            $todoNote->note_content = $request->noteContent;
+            $todoNote->completion_time = null;
+
+            if ($todoNote->save()) {
                 return response()->json(['status' => 'success', 'message' => 'Post created successfully']);
+
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
@@ -36,7 +47,6 @@ class PostController extends Controller
 
             if ($post->save()) {
                 return response()->json(['status' => 'success', 'message' => 'Post updated successfully']);
-
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);

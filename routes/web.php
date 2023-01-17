@@ -28,5 +28,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('/posts', 'PostController@store');
         $router->put('/posts/{id}', 'PostController@update');
         $router->delete('/posts/{id}', 'PostController@destroy');
+
+        $router->get('/todonotes', 'TodoNoteController@index');
+        $router->post('/todonotes', 'TodoNoteController@store');
+        $router->put('/todonotes/{id}', 'TodoNoteController@update');
+        $router->delete('/todonotes/{id}', 'TodoNoteController@destroy');
     });
 });
