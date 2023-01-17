@@ -12,22 +12,15 @@ class AuthController extends Controller
         $username = $request->username;
         $password = $request->password;
 
-        if (empty($username)) {
-            return response()->json(['status' => 'error', 'message' => 'Need username']);
-        }
+        $this->areUsernameAndPasswordEmpty($username, $password);
 
-        if (empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'Need password']);
-        }
-
-        // Check if password is greater than 5 character
         if (strlen($password) < 6) {
             return response()->json(['status' => 'error', 'message' => 'Password should be min 6 character']);
         }
 
         // Check if user already exist
         if (User::where('username', '=', $username)->exists()) {
-            return response()->json(['status' => 'error', 'message' => 'User already exists with this username']);
+            return response()->json(['status' => 'error', 'message' => 'This username has been registered']);
         }
 
         // Create new user
@@ -61,14 +54,7 @@ class AuthController extends Controller
         $username = $request->username;
         $password = $request->password;
 
-        // TODO duplicate codes
-        if (empty($username)) {
-            return response()->json(['status' => 'error', 'message' => 'Need username']);
-        }
-
-        if (empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'Need password']);
-        }
+        $this->areUsernameAndPasswordEmpty($username, $password);
 
         $credentials = request(['username', 'password']);
 
@@ -93,5 +79,17 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
+    }
+
+    // TODO protected?
+    protected function areUsernameAndPasswordEmpty($username, $password)
+    {
+         if (empty($username)) {
+            return response()->json(['status' => 'error', 'message' => 'Need username']);
+         }
+
+         if (empty($password)) {
+            return response()->json(['status' => 'error', 'message' => 'Need password']);
+         }
     }
 }
