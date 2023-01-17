@@ -9,18 +9,15 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $name = $request->name;
-        $email = $request->email;
+        $username = $request->username;
         $password = $request->password;
 
-        // Check if field is empty
-        if (empty($name) or empty($email) or empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'You must fill all the fields']);
+        if (empty($username)) {
+            return response()->json(['status' => 'error', 'message' => 'Need username']);
         }
 
-        // Check if email is valid
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return response()->json(['status' => 'error', 'message' => 'You must enter a valid email']);
+        if (empty($password)) {
+            return response()->json(['status' => 'error', 'message' => 'Need password']);
         }
 
         // Check if password is greater than 5 character
@@ -29,15 +26,14 @@ class AuthController extends Controller
         }
 
         // Check if user already exist
-        if (User::where('email', '=', $email)->exists()) {
-            return response()->json(['status' => 'error', 'message' => 'User already exists with this email']);
+        if (User::where('username', '=', $username)->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'User already exists with this username']);
         }
 
         // Create new user
         try {
             $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
+            $user->username = $request->username;
             $user->password = app('hash')->make($request->password);
 
             if ($user->save()) {
@@ -62,15 +58,19 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $email = $request->email;
+        $username = $request->username;
         $password = $request->password;
 
-        // Check if field is empty
-        if (empty($email) or empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'You must fill all the fields']);
+        // TODO duplicate codes
+        if (empty($username)) {
+            return response()->json(['status' => 'error', 'message' => 'Need username']);
         }
 
-        $credentials = request(['email', 'password']);
+        if (empty($password)) {
+            return response()->json(['status' => 'error', 'message' => 'Need password']);
+        }
+
+        $credentials = request(['username', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
