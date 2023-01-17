@@ -24,14 +24,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->group(['middleware' => 'auth'], function () use ($router) {
         $router->post('/logout', 'AuthController@logout');
-        $router->get('/posts', 'PostController@index');
-        $router->post('/posts', 'PostController@store');
-        $router->put('/posts/{id}', 'PostController@update');
-        $router->delete('/posts/{id}', 'PostController@destroy');
 
-        $router->get('/todonotes', 'TodoNoteController@index');
-        $router->post('/todonotes', 'TodoNoteController@store');
+        $router->get('/todonotes', 'TodoNoteController@getList');
+        //$router->get('/todonotes', 'TodoNoteController@getListOfLoggedInUser');
+        $router->post('/todonotes', 'TodoNoteController@create');
         $router->put('/todonotes/{id}', 'TodoNoteController@update');
-        $router->delete('/todonotes/{id}', 'TodoNoteController@destroy');
+        $router->delete('/todonotes/{id}', 'TodoNoteController@delete');
     });
 });

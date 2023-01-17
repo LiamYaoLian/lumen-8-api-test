@@ -12,7 +12,9 @@ class AuthController extends Controller
         $username = $request->username;
         $password = $request->password;
 
-        $this->areUsernameAndPasswordEmpty($username, $password);
+        if (empty($username) or empty($password)) {
+            return response()->json(['status' => 'error', 'message' => 'Need username and password']);
+        }
 
         if (strlen($password) < 6) {
             return response()->json(['status' => 'error', 'message' => 'Password should be min 6 character']);
@@ -54,7 +56,9 @@ class AuthController extends Controller
         $username = $request->username;
         $password = $request->password;
 
-        $this->areUsernameAndPasswordEmpty($username, $password);
+        if (empty($username) or empty($password)) {
+            return response()->json(['status' => 'error', 'message' => 'Need username and password']);
+        }
 
         $credentials = request(['username', 'password']);
 
@@ -79,17 +83,5 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
-    }
-
-    // TODO protected?
-    protected function areUsernameAndPasswordEmpty($username, $password)
-    {
-         if (empty($username)) {
-            return response()->json(['status' => 'error', 'message' => 'Need username']);
-         }
-
-         if (empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'Need password']);
-         }
     }
 }

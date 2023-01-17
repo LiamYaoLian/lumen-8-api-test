@@ -2,35 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
 use App\Models\TodoNote;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\JWTAuth;
 
 class TodoNoteController extends Controller
 {
-    public function listForLoggedInUser()
+    public function getList(Request $request)
     {
-        // TODO
-        return TodoNote::all();
+        $userStr = $request->query('user');
+
+        // if url is '/todonotes?user=me'
+        if ($userStr == 'me') {
+            return $this->getListOfLoggedInUser();
+
+        // if url is '/todonotes?user={username}'
+        } else {
+            return $this->getListByUsername($userStr);
+        }
     }
 
-    public function listForUser($userId)
-    {
-    }
-
-    public function store(Request $request)
+    public function create(Request $request)
     {
         try {
             $todoNote = new TodoNote();
-
-            // TODO style
+            // TODO need to replace style
             $todoNote->user_id = auth()->user()->id;
             $todoNote->note_content = $request->noteContent;
             $todoNote->completion_time = null;
 
             if ($todoNote->save()) {
-                return response()->json(['status' => 'success', 'message' => 'Post created successfully']);
+                return response()->json(['status' => 'success', 'message' => 'To-do note created successfully']);
 
             }
         } catch (\Exception $e) {
@@ -38,31 +40,61 @@ class TodoNoteController extends Controller
         }
     }
 
+    // TODO how to mark it as completed
     public function update(Request $request, $id)
     {
         try {
-            $post = Post::findOrFail($id);
-            $post->title = $request->title;
-            $post->body = $request->body;
+            $todoNote = TodoNote::findOrFail($id);
+            if ($todoNote->user_id != auth()->user()->id) {
+                return response()->json(['status' => 'error', 'message' => 'This note is not yours']);
+            }
+            $todoNote->note_content = $request->noteContent;
 
-            if ($post->save()) {
-                return response()->json(['status' => 'success', 'message' => 'Post updated successfully']);
+            if ($todoNote->save()) {
+                // TODO
+                return response()->json(['status' => 'success', 'message' => 'Note content updated successfully']);
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
-    public function destroy($id)
+    public function delete($id)
     {
         try {
-            $post = Post::findOrFail($id);
+            $todoNote = TodoNote::findOrFail($id);
 
-            if ($post->delete()) {
-                return response()->json(['status' => 'success', 'message' => 'Post deleted successfully']);
+            if ($todoNote->user_id != auth()->user()->id) {
+                return response()->json(['status' => 'error', 'message' => 'This note is not yours']);
+            }
+
+            if ($todoNote->delete()) {
+                return response()->json(['status' => 'success', 'message' => 'Note deleted successfully']);
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
+
+    private function getListOfLoggedInUser()
+    {
+        $currentUserId = auth()->user()->id;
+        return $this->getListByUserId($currentUserId);
+    }
+
+    private function getListByUsername($username)
+    {
+        $users = User::where('username', '=', $username)->get();
+        // TODO
+        $userId = $users[0]->id;
+        return $this->getListByUserId($userId);
+    }
+
+    private function getListByUserId($userId)
+    {
+        $todoNotes = TodoNote::where('user_id', '=', $userId)->get();
+        return $todoNotes;
+    }
+
+
 }
